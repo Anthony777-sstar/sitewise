@@ -1,0 +1,6 @@
+.vercel
+.env*
+nul
+*.class
+out/
+.local-run/

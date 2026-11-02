@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Axion Studio</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ====== HERO SECTION ====== -->
+  <section class="hero">
+    <div class="shader-overlay">
+      <canvas id="shaderCanvas"></canvas>
+    </div>
+
+    <div class="nav-wrapper">
+      <nav class="nav">
+        <div class="nav-left">
+          <a href="#" class="logo">AX</a>
+          <div class="nav-links">
+            <a href="#">Projects</a>
+            <a href="#">Studio</a>
+            <a href="#">Journal</a>
+            <a href="#">Connect</a>
+          </div>
+        </div>
+        <div class="nav-right">
+          <span class="nav-text">Taking on projects for Q1 2026</span>
+          <span class="nav-time">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <polyline points="12 6 12 12 16 14"/>
+            </svg>
+            <span id="londonTimeNav"><span id="londonTimeDisplay">--:--</span> in London</span>
+          </span>
+          <button class="btn-roll btn-dark">
+            <span class="roll-wrapper" style="height:14px">
+              <span class="roll-text">Book a strategy call</span>
+              <span class="roll-text">Book a strategy call</span>
+            </span>
+            <span class="arrow-circle arrow-circle-white">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M5 12h14"/>
+                <path d="m12 5 7 7-7 7"/>
+              </svg>
+            </span>
+          </button>
+        </div>
+        <button class="mobile-menu-btn" id="mobileMenuBtn">
+          <svg id="menuIcon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="4" x2="20" y1="12" y2="12"/>
+            <line x1="4" x2="20" y1="6" y2="6"/>
+            <line x1="4" x2="20" y1="18" y2="18"/>
+          </svg>
+        </button>
+      </nav>
+    </div>
+
+    <div class="mobile-overlay" id="mobileOverlay">
+      <div class="mobile-sheet" id="mobileSheet">
+        <div class="mobile-sheet-time">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
+          <span id="mobileLondonTime">--:-- in London</span>
+        </div>
+        <div class="mobile-sheet-links">
+          <a href="#">Projects</a>
+          <a href="#">Studio</a>
+          <a href="#">Journal</a>
+          <a href="#">Connect</a>
+        </div>
+        <button class="mobile-sheet-btn">
+          <span>Start a project</span>
+          <span class="arrow-circle">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 12h14"/>
+              <path d="m12 5 7 7-7 7"/>
+            </svg>
+          </span>
+        </button>
+      </div>
+    </div>
+
+    <div class="hero-spacer"></div>
+
+    <div class="hero-content">
+      <span class="hero-label">Axion Studio</span>
+      <h1 class="hero-headline">
+        We craft digital experiences<span class="space-mobile"> </span><br class="br-desktop">
+        for brands ready to dominate<span class="space-mobile"> </span><br class="br-desktop">
+        their category online.
+      </h1>
+      <div class="hero-cta">
+        <button class="btn-roll btn-orange">
+          <span class="roll-wrapper" style="height:14px">
+            <span class="roll-text">Start a project</span>
+            <span class="roll-text">Start a project</span>
+          </span>
+          <span class="arrow-circle arrow-circle-orange">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 12h14"/>
+              <path d="m12 5 7 7-7 7"/>
+            </svg>
+          </span>
+        </button>
+        <div class="partner-badge">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+            <path d="m19.6 66.5 19.7-11 .3-1-.3-.5h-1l-3.3-.2-11.2-.3L14 53l-9.5-.5-2.4-.5L0 49l.2-1.5 2-1.3 2.9.2 6.3.5 9.5.6 6.9.4L38 49.1h1.6l.2-.7-.5-.4-.4-.4L29 41l-10.6-7-5.6-4.1-3-2-1.5-2-.6-4.2 2.7-3 3.7.3.9.2 3.7 2.9 8 6.1L37 36l1.5 1.2.6-.4.1-.3-.7-1.1L33 25l-6-10.4-2.7-4.3-.7-2.6c-.3-1-.4-2-.4-3l3-4.2L28 0l4.2.6L33.8 2l2.6 6 4.1 9.3L47 29.9l2 3.8 1 3.4.3 1h.7v-.5l.5-7.2 1-8.7 1-11.2.3-3.2 1.6-3.8 3-2L61 2.6l2 2.9-.3 1.8-1.1 7.7L59 27.1l-1.5 8.2h.9l1-1.1 4.1-5.4 6.9-8.6 3-3.5L77 13l2.3-1.8h4.3l3.1 4.7-1.4 4.9-4.4 5.6-3.7 4.7-5.3 7.1-3.2 5.7.3.4h.7l12-2.6 6.4-1.1 7.6-1.3 3.5 1.6.4 1.6-1.4 3.4-8.2 2-9.6 2-14.3 3.3-.2.1.2.3 6.4.6 2.8.2h6.8l12.6 1 3.3 2 1.9 2.7-.3 2-5.1 2.6-6.8-1.6-16-3.8-5.4-1.3h-.8v.4l4.6 4.5 8.3 7.5L89 80.1l.5 2.4-1.3 2-1.4-.2-9.2-7-3.6-3-8-6.8h-.5v.7l1.8 2.7 9.8 14.7.5 4.5-.7 1.4-2.6 1-2.7-.6-5.8-8-6-9-4.7-8.2-.5.4-2.9 30.2-1.3 1.5-3 1.2-2.5-2-1.4-3 1.4-6.2 1.6-8 1.3-6.4 1.2-7.9.7-2.6v-.2H49L43 72l-9 12.3-7.2 7.6-1.7.7-3-1.5.3-2.8L24 86l10-12.8 6-7.9 4-4.6-.1-.5h-.3L17.2 77.4l-4.7.6-2-2 .2-3 1-1 8-5.5Z"/>
+          </svg>
+          <span class="partner-text">Certified Partner</span>
+          <span class="featured-badge">Featured</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== ABOUT SECTION ====== -->
+  <section class="about">
+    <div class="about-inner">
+      <div class="badge-row">
+        <span class="badge-circle">1</span>
+        <span class="badge-pill">Introducing Axion</span>
+      </div>
+
+      <h2 class="section-heading">
+        Strategy-led creatives, delivering<span class="space-mobile"> </span><br class="br-desktop">
+        results in digital and beyond.
+      </h2>
+
+      <div class="about-content-mobile">
+        <p class="about-text">
+          Through research, creative thinking and iteration we help growing brands realize their digital full potential.
+        </p>
+        <button class="btn-roll btn-about" style="margin-bottom:24px">
+          <span class="roll-wrapper" style="height:14px">
+            <span class="roll-text">About our studio</span>
+            <span class="roll-text">About our studio</span>
+          </span>
+          <span class="arrow-circle arrow-circle-orange">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 12h14"/>
+              <path d="m12 5 7 7-7 7"/>
+            </svg>
+          </span>
+        </button>
+
+        <div class="about-images">
+          <img class="about-img-small" src="https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260516_090123_74be96d4-9c1b-40cf-932a-96f4f4babed3.png&w=1280&q=85" alt="Axion Studio workspace" loading="lazy">
+          <img class="about-img-large" src="https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260516_090133_c157d30b-a99a-4477-bec1-a446149ec3f2.png&w=1280&q=85" alt="Axion Studio team" loading="lazy">
+        </div>
+      </div>
+
+      <div class="about-content-desktop">
+        <div class="about-col-left">
+          <img src="https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260516_090123_74be96d4-9c1b-40cf-932a-96f4f4babed3.png&w=1280&q=85" alt="Axion Studio workspace" loading="lazy">
+        </div>
+        <div class="about-col-center">
+          <p>Through research, creative thinking<br>and iteration we help growing brands<br>realize their digital full potential.</p>
+          <button class="btn-roll btn-about">
+            <span class="roll-wrapper" style="height:14px">
+              <span class="roll-text">About our studio</span>
+              <span class="roll-text">About our studio</span>
+            </span>
+            <span class="arrow-circle arrow-circle-orange">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M5 12h14"/>
+                <path d="m12 5 7 7-7 7"/>
+              </svg>
+            </span>
+          </button>
+        </div>
+        <div class="about-col-right">
+          <img src="https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260516_090133_c157d30b-a99a-4477-bec1-a446149ec3f2.png&w=1280&q=85" alt="Axion Studio team" loading="lazy">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== CASE STUDIES SECTION ====== -->
+  <section class="case-studies">
+    <div class="case-studies-inner">
+      <div class="badge-row">
+        <span class="badge-circle">2</span>
+        <span class="badge-pill badge-pill-gray">Featured client work</span>
+      </div>
+
+      <h2 class="section-heading">Our projects</h2>
+
+      <div class="cards-grid">
+        <div class="card">
+          <div class="card-video-container card-video-1">
+            <video autoplay muted loop playsinline>
+              <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260516_122702_390f5305-8719-41d5-ae80-d23ab3796c28.mp4" type="video/mp4">
+            </video>
+            <button class="card-hover-btn card-hover-btn-light">
+              <span class="card-btn-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                  <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                </svg>
+              </span>
+              <span class="card-btn-text">Learn more</span>
+            </button>
+          </div>
+          <p class="card-desc">Winner of Site of the Month 2025 &mdash; an interactive 3D showcase driving record engagement</p>
+          <p class="card-title">Narrativ</p>
+        </div>
+
+        <div class="card">
+          <div class="card-video-container card-video-2">
+            <video autoplay muted loop playsinline>
+              <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260516_123323_f909c2b8-ff6c-4edf-882b-8ebcdbe389b5.mp4" type="video/mp4">
+            </video>
+            <button class="card-hover-btn card-hover-btn-dark">
+              <span class="card-btn-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M5 12h14"/>
+                  <path d="m12 5 7 7-7 7"/>
+                </svg>
+              </span>
+              <span class="card-btn-text">View case study</span>
+            </button>
+          </div>
+          <p class="card-desc">Transforming a dated platform into a conversion-focused brand experience</p>
+          <p class="card-title">Luminar</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <script type="module" src="script.js"></script>
+</body>
+</html>

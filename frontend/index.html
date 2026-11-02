@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sitewise — Construction Risk Assessment</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="lp-nav">
+        <div class="lp-nav-left">
+            <a href="/" class="lp-nav-logo">SW</a>
+            <div class="lp-nav-links">
+                <a href="#features" class="lp-nav-link">Features</a>
+                <a href="#features" class="lp-nav-link">About</a>
+                <a href="auth.html" class="lp-nav-link">Sign In</a>
+            </div>
+        </div>
+        <div class="lp-nav-right">
+            <span class="lp-nav-text"></span>
+            <div class="lp-nav-time">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                <span id="londonTime">--:-- in London</span>
+            </div>
+            <a href="auth.html?mode=signup" class="lp-nav-cta group">
+                <span class="text-roll-wrap">
+                    <span class="text-roll-inner">
+                        <span>Start Free Assessment</span>
+                        <span>Start Free Assessment</span>
+                    </span>
+                </span>
+                <span class="cta-icon icon-rotate">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                </span>
+            </a>
+        </div>
+        <button class="lp-nav-hamburger" id="hamburgerBtn" aria-label="Menu">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div class="lp-mobile-overlay" id="mobileOverlay">
+        <div class="lp-mobile-sheet">
+            <div class="time-badge">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                <span id="mobileTime">--:-- in London</span>
+            </div>
+            <a href="#features" onclick="closeMobile()">Features</a>
+            <a href="#features" onclick="closeMobile()">About</a>
+            <a href="auth.html">Sign In</a>
+            <a href="auth.html?mode=signup" class="mobile-cta group">
+                <span class="text-roll-wrap">
+                    <span class="text-roll-inner">
+                        <span>Start Free Assessment</span>
+                        <span>Start Free Assessment</span>
+                    </span>
+                </span>
+                <span class="cta-icon icon-rotate">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                </span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="lp-hero" id="hero">
+        <div class="shader-overlay">
+            <canvas class="lp-shader-canvas" id="shaderCanvas"></canvas>
+        </div>
+        <div class="lp-hero-content">
+            <div class="lp-hero-label">Sitewise</div>
+            <h1 class="lp-hero-headline">
+                Eliminate construction risk<br class="sm-break"><span class="sm-hide"> </span>blind spots with<br class="sm-break"><span class="sm-hide"> </span>AI-powered precision
+            </h1>
+            <div class="lp-hero-cta-row">
+                <a href="auth.html?mode=signup" class="lp-btn-orange group">
+                    <span class="text-roll-wrap">
+                        <span class="text-roll-inner">
+                            <span>Start a project</span>
+                            <span>Start a project</span>
+                        </span>
+                    </span>
+                    <span class="icon-circle icon-rotate">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                    </span>
+                </a>
+                <div class="lp-partner-badge">
+                    <svg viewBox="0 0 100 100"><path d="m19.6 66.5 19.7-11 .3-1-.3-.5h-1l-3.3-.2-11.2-.3L14 53l-9.5-.5-2.4-.5L0 49l.2-1.5 2-1.3 2.9.2 6.3.5 9.5.6 6.9.4L38 49.1h1.6l.2-.7-.5-.4-.4-.4L29 41l-10.6-7-5.6-4.1-3-2-1.5-2-.6-4.2 2.7-3 3.7.3.9.2 3.7 2.9 8 6.1L37 36l1.5 1.2.6-.4.1-.3-.7-1.1L33 25l-6-10.4-2.7-4.3-.7-2.6c-.3-1-.4-2-.4-3l3-4.2L28 0l4.2.6L33.8 2l2.6 6 4.1 9.3L47 29.9l2 3.8 1 3.4.3 1h.7v-.5l.5-7.2 1-8.7 1-11.2.3-3.2 1.6-3.8 3-2L61 2.6l2 2.9-.3 1.8-1.1 7.7L59 27.1l-1.5 8.2h.9l1-1.1 4.1-5.4 6.9-8.6 3-3.5L77 13l2.3-1.8h4.3l3.1 4.7-1.4 4.9-4.4 5.6-3.7 4.7-5.3 7.1-3.2 5.7.3.4h.7l12-2.6 6.4-1.1 7.6-1.3 3.5 1.6.4 1.6-1.4 3.4-8.2 2-9.6 2-14.3 3.3-.2.1.2.3 6.4.6 2.8.2h6.8l12.6 1 3.3 2 1.9 2.7-.3 2-5.1 2.6-6.8-1.6-16-3.8-5.4-1.3h-.8v.4l4.6 4.5 8.3 7.5L89 80.1l.5 2.4-1.3 2-1.4-.2-9.2-7-3.6-3-8-6.8h-.5v.7l1.8 2.7 9.8 14.7.5 4.5-.7 1.4-2.6 1-2.7-.6-5.8-8-6-9-4.7-8.2-.5.4-2.9 30.2-1.3 1.5-3 1.2-2.5-2-1.4-3 1.4-6.2 1.6-8 1.3-6.4 1.2-7.9.7-2.6v-.2H49L43 72l-9 12.3-7.2 7.6-1.7.7-3-1.5.3-2.8L24 86l10-12.8 6-7.9 4-4.6-.1-.5h-.3L17.2 77.4l-4.7.6-2-2 .2-3 1-1 8-5.5Z"/></svg>
+                    <span class="lp-partner-badge-text">Powered by Groq AI</span>
+                    <span class="lp-partner-badge-featured">Featured</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Case Studies / Features Section -->
+    <section class="lp-cases" id="features">
+        <div class="lp-cases-inner">
+            <div class="lp-badge-row">
+                <div class="lp-badge-num">2</div>
+                <span class="lp-badge-label">Core features</span>
+            </div>
+            <h2 class="lp-cases-heading">Built for teams<br>who need clarity</h2>
+
+            <div class="lp-cases-grid">
+                <!-- Card 1 -->
+                <div class="lp-case-card">
+                    <div class="lp-case-video-wrap aspect-video">
+                        <video autoplay muted loop playsInline src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260516_122702_390f5305-8719-41d5-ae80-d23ab3796c28.mp4"></video>
+                        <div class="lp-case-hover-btn">
+                            <span class="btn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></span>
+                            <span class="btn-text">Learn more</span>
+                        </div>
+                    </div>
+                    <p class="lp-case-desc">Four critical factors combined into a weighted 0&ndash;100 score with clear risk labels.</p>
+                    <div class="lp-case-title">Risk Scoring Engine</div>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="lp-case-card">
+                    <div class="lp-case-video-wrap aspect-square">
+                        <video autoplay muted loop playsInline src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260516_123323_f909c2b8-ff6c-4edf-882b-8ebcdbe389b5.mp4"></video>
+                        <div class="lp-case-hover-btn dark-btn">
+                            <span class="btn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+                            <span class="btn-text">View case study</span>
+                        </div>
+                    </div>
+                    <p class="lp-case-desc">Natural-language breakdowns generated by Llama 3.3 70B with actionable recommendations.</p>
+                    <div class="lp-case-title">AI Executive Summaries</div>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="lp-case-card">
+                    <div class="lp-case-video-wrap aspect-square">
+                        <video autoplay muted loop playsInline src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260516_122702_390f5305-8719-41d5-ae80-d23ab3796c28.mp4"></video>
+                        <div class="lp-case-hover-btn dark-btn">
+                            <span class="btn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></span>
+                            <span class="btn-text">View case study</span>
+                        </div>
+                    </div>
+                    <p class="lp-case-desc">All assessments saved to your account. Export clean PDF reports with one click.</p>
+                    <div class="lp-case-title">Project History &amp; PDF Reports</div>
+                </div>
+
+                <!-- Card 4 -->
+                <div class="lp-case-card">
+                    <div class="lp-case-video-wrap aspect-video">
+                        <video autoplay muted loop playsInline src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260516_123323_f909c2b8-ff6c-4edf-882b-8ebcdbe389b5.mp4"></video>
+                        <div class="lp-case-hover-btn">
+                            <span class="btn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></span>
+                            <span class="btn-text">Learn more</span>
+                        </div>
+                    </div>
+                    <p class="lp-case-desc">Powered by Supabase Auth with Row Level Security. Your data is isolated and encrypted.</p>
+                    <div class="lp-case-title">Enterprise-Grade Security</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="lp-footer">
+        <div class="lp-footer-inner">
+            <div class="lp-footer-logo">
+                <span class="accent-dot"></span>
+                Sitewise
+            </div>
+            <div class="lp-footer-links">
+                <a href="#features">About</a>
+                <a href="#features">Features</a>
+                <a href="auth.html">Sign In</a>
+            </div>
+            <div class="lp-footer-copy">&copy; 2026 Sitewise. All rights reserved.</div>
+        </div>
+    </footer>
+
+    <script>
+        // ─── London Clock ────────────────────────────────────
+        function updateClock() {
+            const now = new Date();
+            const time = now.toLocaleTimeString('en-GB', { timeZone: 'Europe/London', hour: '2-digit', minute: '2-digit' });
+            document.getElementById('londonTime').textContent = time + ' in London';
+            const mt = document.getElementById('mobileTime');
+            if (mt) mt.textContent = time + ' in London';
+        }
+        updateClock();
+        setInterval(updateClock, 1000);
+
+        // ─── Mobile Menu ────────────────────────────────────
+        const overlay = document.getElementById('mobileOverlay');
+        document.getElementById('hamburgerBtn').addEventListener('click', () => overlay.classList.add('open'));
+        overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.classList.remove('open'); });
+        window.closeMobile = () => overlay.classList.remove('open');
+
+        // ─── Shaders ──────────────────────────────────────
+        document.addEventListener('DOMContentLoaded', function() {
+            const s = document.createElement('script');
+            s.src = 'shader.js';
+            document.body.appendChild(s);
+        });
+
+        // ─── Smooth scroll for anchor links ────────────────
+        document.querySelectorAll('a[href^="#"]').forEach(a => {
+            a.addEventListener('click', (e) => {
+                const id = a.getAttribute('href');
+                if (id === '#') return;
+                const el = document.querySelector(id);
+                if (el) {
+                    e.preventDefault();
+                    el.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

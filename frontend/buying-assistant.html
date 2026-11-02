@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sitewise — Buying Assistant</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="supabase-client.js"></script>
+    <script src="api.js"></script>
+    <style>
+        body { background: var(--bg); position: relative; }
+        .ba-shell { display: flex; height: 100vh; overflow: hidden; position: relative; z-index: 1; }
+
+        .ba-sidebar {
+            width: var(--sidebar-width); min-width: var(--sidebar-width);
+            background: var(--sidebar-bg); display: flex; flex-direction: column;
+            border-right: 1px solid var(--border);
+        }
+
+        .ba-sidebar-header {
+            padding: 20px; display: flex; align-items: center; gap: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .ba-sidebar-header .logo-text { color: var(--text-primary); font-weight: 600; font-size: 1rem; }
+        .ba-sidebar-header .accent-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); display: inline-block; }
+
+        .ba-new-btn {
+            margin: 16px 20px; padding: 12px 20px;
+            background: var(--accent); color: #fff; border: none;
+            border-radius: 50px; font-size: 0.875rem; font-weight: 600;
+            cursor: pointer; transition: background 0.3s;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+
+        .ba-new-btn:hover { background: #e05a1a; }
+
+        .ba-history { flex: 1; overflow-y: auto; padding: 8px 0; }
+        .ba-history::-webkit-scrollbar { width: 4px; }
+        .ba-history::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 4px; }
+
+        .ba-history-item {
+            padding: 12px 20px; cursor: pointer;
+            transition: all 0.2s var(--transition-smooth);
+            border-left: 2px solid transparent;
+        }
+
+        .ba-history-item:hover { background: rgba(0,0,0,0.04); }
+        .ba-history-item.active { background: rgba(242,101,34,0.08); border-left-color: var(--accent); }
+        .ba-history-item-name { color: var(--text-primary); font-size: 0.875rem; font-weight: 500; }
+        .ba-history-item-meta { color: var(--text-secondary); font-size: 0.75rem; }
+        .ba-history-location { font-size: 0.6875rem; color: var(--accent); margin-top: 2px; }
+
+        .ba-main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+
+        .ba-topbar {
+            height: 56px; display: flex; align-items: center;
+            justify-content: space-between;
+            padding: 0 24px; border-bottom: 1px solid var(--border);
+            background: var(--surface);
+        }
+
+        .ba-topbar-title { font-size: 0.9375rem; font-weight: 500; color: var(--text-secondary); }
+
+        .ba-close-btn {
+            background: none; border: 1px solid var(--border);
+            color: var(--text-secondary); width: 36px; height: 36px;
+            border-radius: 50%; font-size: 1.25rem; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s var(--transition-smooth);
+        }
+
+        .ba-close-btn:hover { background: var(--risk-critical-bg); border-color: var(--risk-critical); color: var(--risk-critical); }
+
+        .ba-messages {
+            flex: 1; overflow-y: auto; padding: 32px;
+            display: flex; flex-direction: column; gap: 24px;
+        }
+        .ba-messages::-webkit-scrollbar { width: 6px; }
+        .ba-messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 6px; }
+
+        .ba-empty {
+            flex: 1; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; text-align: center;
+            padding: 32px; color: var(--text-secondary);
+        }
+        .ba-empty-icon { width: 64px; height: 64px; border-radius: 16px; background: rgba(242,101,34,0.1); display: flex; align-items: center; justify-content: center; margin-bottom: 20px; font-size: 2rem; }
+        .ba-empty h2 { font-size: 1.25rem; color: var(--text-primary); margin-bottom: 8px; }
+
+        .ba-msg { max-width: 680px; width: 100%; margin: 0 auto; animation: fadeUp 0.4s var(--transition-smooth); }
+
+        .ba-msg-user {
+            background: var(--accent); color: #fff;
+            padding: 16px 22px; border-radius: 20px 20px 4px 20px;
+            font-size: 0.9375rem; line-height: 1.7;
+            max-width: 520px; margin-left: auto;
+        }
+
+        .ba-msg-assistant { display: flex; gap: 14px; align-items: flex-start; }
+        .ba-msg-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 0.75rem; flex-shrink: 0; }
+        .ba-msg-content { background: var(--surface); border: 1px solid var(--border); padding: 16px 20px; border-radius: 4px 20px 20px 20px; font-size: 0.9375rem; line-height: 1.7; color: var(--text-primary); }
+        .ba-msg-content p { margin-bottom: 12px; }
+        .ba-msg-content p:last-child { margin-bottom: 0; }
+
+        .ba-pdf-badge { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; background: rgba(242,101,34,0.06); border: 1px solid rgba(242,101,34,0.15); border-radius: 8px; font-size: 0.75rem; color: var(--accent); margin-bottom: 12px; }
+
+        .ba-bridge-btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            margin-top: 12px; padding: 10px 20px;
+            background: var(--risk-low-bg); border: 1px solid var(--risk-low);
+            border-radius: 50px; font-size: 0.8125rem; font-weight: 600;
+            color: var(--risk-low); cursor: pointer;
+            transition: all 0.3s var(--transition-smooth);
+        }
+        .ba-bridge-btn:hover { background: var(--risk-low-bg); transform: translateY(-1px); }
+
+        /* Location pill in input area */
+        .ba-location-pill {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 4px 12px; background: rgba(242,101,34,0.1);
+            border: 1px solid rgba(242,101,34,0.2); border-radius: 50px;
+            font-size: 0.75rem; color: var(--accent); font-weight: 500;
+            margin-bottom: 8px; max-width: 680px; margin-left: auto; margin-right: auto;
+        }
+
+        .ba-input-area {
+            padding: 20px 24px; border-top: 1px solid var(--border);
+            background: var(--surface);
+        }
+
+        .ba-input-row { display: flex; gap: 12px; align-items: flex-end; max-width: 680px; margin: 0 auto; }
+
+        .ba-input-wrap {
+            flex: 1; display: flex; align-items: center;
+            background: var(--bg); border: 1px solid var(--border);
+            border-radius: 16px; padding: 4px;
+            transition: border-color 0.3s var(--transition-smooth);
+        }
+
+        .ba-input-wrap:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+
+        .ba-input-wrap textarea {
+            flex: 1; border: none; background: transparent;
+            padding: 10px 14px; font-size: 0.9375rem;
+            font-family: inherit; resize: none; outline: none;
+            color: var(--text-primary); line-height: 1.5;
+            min-height: 44px; max-height: 120px;
+        }
+
+        .ba-input-wrap textarea::placeholder { color: var(--text-secondary); opacity: 0.6; }
+
+        .ba-attach-btn { background: none; border: none; color: var(--text-secondary); padding: 8px; cursor: pointer; border-radius: 8px; transition: all 0.2s var(--transition-smooth); font-size: 1.125rem; }
+        .ba-attach-btn:hover { color: var(--accent); background: rgba(242,101,34,0.06); }
+
+        .ba-send-btn {
+            background: var(--accent); color: var(--text-primary); border: none;
+            width: 44px; height: 44px; border-radius: 50%;
+            cursor: pointer; display: flex; align-items: center;
+            justify-content: center; transition: all 0.3s var(--transition-smooth);
+            flex-shrink: 0;
+        }
+
+        .ba-send-btn:hover { background: var(--accent); transform: scale(1.05); }
+        .ba-send-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+        .ba-file-name {
+            max-width: 680px; margin: 0 auto 8px;
+            display: flex; align-items: center; gap: 8px;
+            padding: 6px 12px; background: rgba(242,101,34,0.06);
+            border-radius: 8px; font-size: 0.8125rem; color: var(--accent);
+        }
+        .ba-file-name button { background: none; border: none; color: var(--risk-critical); cursor: pointer; font-size: 1rem; margin-left: auto; }
+
+        .ba-thinking { display: flex; align-items: center; gap: 12px; padding: 12px 0; max-width: 680px; margin: 0 auto; }
+        .ba-thinking-dots { display: flex; gap: 4px; }
+        .ba-thinking-dots span { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); animation: dotBounce 1.4s ease-in-out infinite; }
+        .ba-thinking-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .ba-thinking-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes dotBounce { 0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; } 40% { transform: scale(1); opacity: 1; } }
+
+        /* Modal */
+        .ba-modal-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(8px); z-index: 2000;
+            display: flex; align-items: flex-start; justify-content: center;
+            animation: fadeUp 0.3s var(--transition-smooth);
+            padding: 80px 12px 40px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .ba-modal-close { position: absolute; top: 12px; right: 12px; background: none; border: none; color: var(--text-secondary); font-size: 1.5rem; cursor: pointer; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.2s var(--transition-smooth); z-index: 1; }
+        .ba-modal-close:hover { background: var(--border); color: var(--risk-critical); }
+
+        .ba-modal { background: var(--surface); border-radius: 20px; padding: 32px 20px; max-width: 520px; width: 100%; text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.4); position: relative; margin: auto; }
+
+        @media (min-width: 640px) {
+            .ba-modal { padding: 40px; }
+        }
+
+        .ba-modal h2 { font-size: 1.25rem; margin-bottom: 4px; }
+        .ba-modal .subtitle { color: var(--text-secondary); font-size: 0.9375rem; margin-bottom: 24px; }
+
+        .ba-modal-section { margin-bottom: 24px; }
+        .ba-modal-section-label { font-size: 0.75rem; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px; }
+
+        .ba-pill-group { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+
+        .ba-pill {
+            padding: 14px 24px; border: 1px solid var(--border);
+            border-radius: 50px; cursor: pointer; font-size: 1rem;
+            font-weight: 500; transition: all 0.2s var(--transition-smooth);
+            background: var(--bg); color: var(--text-secondary);
+            min-width: 80px;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        .ba-pill:hover { border-color: var(--accent); color: var(--accent); }
+        .ba-pill.selected { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+        .ba-modal-options { display: flex; flex-direction: column; gap: 12px; }
+
+        .ba-modal-option {
+            padding: 18px 20px; border: 1px solid var(--border);
+            border-radius: 14px; cursor: pointer; text-align: left;
+            transition: all 0.3s var(--transition-smooth);
+            background: var(--bg);
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .ba-modal-option:hover { border-color: var(--accent); background: rgba(242,101,34,0.04); }
+        .ba-modal-option.selected-option { border-color: var(--accent); background: rgba(242,101,34,0.08); }
+        .ba-modal-option h3 { font-size: 1.05rem; margin-bottom: 4px; }
+        .ba-modal-option p { font-size: 0.875rem; margin-bottom: 0; color: var(--text-secondary); }
+
+        .ba-modal-cta {
+            margin-top: 24px; padding: 14px 32px;
+            background: var(--accent); color: #fff;
+            border: none; border-radius: 50px; font-size: 1rem;
+            font-weight: 600; cursor: pointer;
+            transition: background 0.2s;
+            width: 100%;
+        }
+
+        @media (min-width: 640px) {
+            .ba-modal-cta { width: auto; }
+        }
+
+        .ba-modal-cta:hover { background: #e05a1a; }
+        .ba-modal-cta:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+        /* Confirmation modal */
+        .ba-confirm-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(8px); z-index: 3000;
+            display: flex; align-items: center; justify-content: center;
+            animation: fadeUp 0.3s var(--transition-smooth);
+            padding: 20px;
+        }
+        .ba-confirm-modal { background: var(--surface); border-radius: 20px; padding: 28px 20px; max-width: 480px; width: 100%; text-align: center; }
+        @media (min-width: 640px) { .ba-confirm-modal { padding: 36px; } }
+        .ba-confirm-modal h2 { font-size: 1.125rem; margin-bottom: 8px; }
+        .ba-confirm-modal p { color: var(--text-secondary); font-size: 0.875rem; margin-bottom: 24px; }
+        .ba-confirm-actions { display: flex; flex-direction: column; gap: 10px; }
+        @media (min-width: 480px) { .ba-confirm-actions { flex-direction: row; justify-content: center; } }
+        .ba-confirm-cancel { padding: 14px 24px; border: 1px solid var(--border); border-radius: 50px; font-size: 0.9375rem; cursor: pointer; background: var(--surface); color: var(--text-secondary); transition: all 0.2s var(--transition-smooth); }
+        .ba-confirm-cancel:hover { border-color: var(--risk-critical); color: var(--risk-critical); }
+        .ba-confirm-go { padding: 14px 24px; border: none; border-radius: 50px; font-size: 0.9375rem; font-weight: 600; cursor: pointer; background: var(--accent); color: #fff; transition: all 0.2s var(--transition-smooth); }
+        .ba-confirm-go:hover { background: #e05a1a; }
+
+        .ba-msg-assistant > div:last-child {
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 16px 20px;
+        }
+
+        @media (max-width: 768px) {
+            .ba-sidebar { display: flex; position: fixed; top: 0; left: 0; height: 100vh; z-index: 200; transform: translateX(-100%); transition: transform 0.4s var(--transition-smooth); width: 85%; min-width: 260px; }
+            .ba-sidebar.open { transform: translateX(0); }
+            .sidebar-overlay.visible { display: block; }
+            .ba-messages { padding: 12px; }
+            .ba-msg { max-width: 100%; }
+            .ba-msg-user { max-width: 85%; font-size: 0.9375rem; padding: 14px 18px; }
+            .ba-msg-assistant { gap: 10px; }
+            .ba-msg-content { font-size: 0.9375rem; padding: 14px 16px; }
+            .ba-input-area { padding: 12px 12px 16px; }
+            .ba-input-row { gap: 8px; }
+            .ba-input-wrap textarea { font-size: 1rem; padding: 10px 12px; }
+            .ba-send-btn { width: 48px; height: 48px; }
+            .ba-topbar { padding: 0 12px; height: 52px; }
+            .ba-topbar-title { font-size: 0.875rem; }
+            .ba-empty { padding: 20px; }
+            .ba-empty h2 { font-size: 1.125rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="shader-overlay" style="position:fixed;height:100vh;opacity:0.3;">
+        <canvas id="shaderCanvas" style="width:100%;height:100%;"></canvas>
+    </div>
+    <div class="ba-shell">
+
+        <!-- Combined Location + Intent Modal -->
+        <div class="ba-modal-overlay" id="intentModal">
+            <div class="glow-orb glow-orb-sm" style="top:50%;left:50%;transform:translate(-50%,-50%);opacity:0.2;z-index:2001;pointer-events:none;"></div>
+            <div class="ba-modal glass-card-strong">
+                <button class="ba-modal-close" id="intentModalClose">&times;</button>
+                <h2>Start a new conversation</h2>
+                <p class="subtitle">Pick a location and intent, then ask me anything. I'll guide you through rules, red flags, and materials based on official country-specific guides.</p>
+
+                <div class="ba-modal-section">
+                    <div class="ba-modal-section-label">Location</div>
+                    <div class="ba-pill-group" id="locationPills">
+                        <div class="ba-pill" data-location="USA">USA</div>
+                        <div class="ba-pill" data-location="UK">UK</div>
+                        <div class="ba-pill selected" data-location="NIGERIA">Nigeria</div>
+                    </div>
+                </div>
+
+                <div class="ba-modal-section">
+                    <div class="ba-modal-section-label">I want to...</div>
+                    <div class="ba-modal-options">
+                        <div class="ba-modal-option" data-intent="BUY_HOUSE">
+                            <h3>Buy a house</h3>
+                            <p>Get guidance on the home-buying process, inspections, financing, and red flags.</p>
+                        </div>
+                        <div class="ba-modal-option" data-intent="BUILD_HOUSE">
+                            <h3>Build a house</h3>
+                            <p>Explore feasibility, timelines, costs, and risk factors for a new construction project.</p>
+                        </div>
+                        <div class="ba-modal-option" data-intent="BUY_LAND">
+                            <h3>Buy land</h3>
+                            <p>Understand land acquisition, zoning, permits, and what to check before buying.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="ba-modal-cta" id="startConversationBtn">Start Conversation</button>
+            </div>
+        </div>
+
+        <!-- Confirmation Modal -->
+        <div class="ba-confirm-overlay hidden" id="confirmModal">
+            <div class="ba-confirm-modal glass-card-strong">
+                <h2>Create a Risk Assessment?</h2>
+                <p>Based on this conversation, the assistant thinks a full risk assessment would help. This will open the risk assessment tool with context from this chat.</p>
+                <div class="ba-confirm-actions">
+                    <button class="ba-confirm-cancel" id="confirmCancel">Cancel</button>
+                    <button class="ba-confirm-go" id="confirmGo">Create Assessment</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar Overlay (mobile) -->
+        <div class="sidebar-overlay" id="baSidebarOverlay"></div>
+
+        <!-- Sidebar -->
+        <aside class="ba-sidebar glass-card-strong" id="baSidebar" style="border-right:1px solid var(--border);border-radius:0;">
+            <div class="ba-sidebar-header">
+                <span class="accent-dot"></span>
+                <span class="logo-text">Buying Assistant</span>
+            </div>
+
+            <div class="sidebar-nav">
+                <a href="buying-assistant.html" class="sidebar-nav-link active">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+                    </svg>
+                    Buying Assistant
+                </a>
+                <a href="app.html" class="sidebar-nav-link">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 14l2 2 4-4"/>
+                    </svg>
+                    Assessments
+                </a>
+            </div>
+
+            <button class="ba-new-btn" id="baNewBtn">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <path d="M8 3v10M3 8h10"/>
+                </svg>
+                New Conversation
+            </button>
+
+            <div class="ba-history" id="baHistory"></div>
+        </aside>
+
+        <!-- Main -->
+        <main class="ba-main">
+            <div class="ba-topbar">
+                <button class="sidebar-toggle" id="baSidebarToggle">&#9776;</button>
+                <span class="ba-topbar-title" id="baTopbarTitle">Buying Assistant</span>
+                <button class="ba-close-btn" id="baCloseBtn" title="Close">&times;</button>
+            </div>
+
+            <div class="ba-messages" id="baMessages">
+                <div class="glow-orb glow-orb-sm" style="top:40%;left:50%;transform:translate(-50%,-50%);opacity:0.15;pointer-events:none;"></div>
+                <div class="ba-empty" id="baEmpty">
+                    <div class="ba-empty-icon">
+                        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent);">
+                            <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+                        </svg>
+                    </div>
+                    <h2>Start a conversation</h2>
+                    <p>Ask questions about buying a house, building one, or purchasing land.</p>
+                </div>
+            </div>
+
+            <!-- File name display -->
+            <div id="baFileName" class="ba-file-name hidden">
+                <span id="baFileNameText"></span>
+                <button id="baFileRemove">&times;</button>
+            </div>
+
+            <!-- Input -->
+            <div class="ba-input-area">
+                <div id="baLocationPill" class="ba-location-pill glass-card hidden"></div>
+                <div class="ba-input-row">
+                    <div class="ba-input-wrap">
+                        <textarea id="baInput" rows="1" placeholder="Ask about rules, red flags, or attach a PDF for document review..." style="height:44px;"></textarea>
+                        <button class="ba-attach-btn" id="baAttachBtn" title="Attach PDF">&#128206;</button>
+                    </div>
+                    <button class="ba-send-btn" id="baSendBtn" disabled>
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <input type="file" id="baFileInput" accept=".pdf,.md,.txt,.csv" style="display:none;">
+
+    <script src="buying-assistant.js"></script>
+    <script src="shader.js"></script>
+</body>
+</html>

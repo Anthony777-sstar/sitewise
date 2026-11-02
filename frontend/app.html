@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sitewise — App</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="supabase-client.js"></script>
+    <style>
+        .assessment-section {
+            max-width: 640px; margin: 0 auto; padding: 24px 0;
+        }
+        .assessment-section.hidden { display: none; }
+
+        .assessment-bridge-banner {
+            display: flex; align-items: center; gap: 10px;
+            padding: 12px 16px; background: rgba(242,101,34,0.06);
+            border: 1px solid rgba(242,101,34,0.12);
+            border-radius: 12px; font-size: 0.8125rem;
+            color: var(--accent); margin-bottom: 24px;
+        }
+
+        .assessment-bridge-banner a {
+            color: var(--accent); font-weight: 600;
+            text-decoration: none; margin-left: auto;
+        }
+        .assessment-bridge-banner a:hover { text-decoration: underline; }
+
+        .assessment-form { display: flex; flex-direction: column; gap: 20px; }
+
+        .af-field { display: flex; flex-direction: column; gap: 6px; }
+
+        .af-field label {
+            font-size: 0.8125rem; font-weight: 600;
+            color: var(--text-primary); display: flex;
+            justify-content: space-between; align-items: center;
+        }
+
+        .af-field label .af-value {
+            font-weight: 700; color: var(--accent);
+            font-size: 0.9375rem;
+        }
+
+        .af-field input[type="text"] {
+            padding: 12px 16px; border: 1px solid var(--border);
+            border-radius: 12px; font-size: 0.9375rem;
+            font-family: inherit; outline: none;
+            transition: border-color 0.3s var(--transition-smooth);
+            background: var(--bg);
+        }
+        .af-field input[type="text"]:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        .af-slider-wrap {
+            position: relative;
+        }
+
+        .af-slider-wrap input[type="range"] {
+            -webkit-appearance: none; appearance: none;
+            width: 100%; height: 6px;
+            background: var(--border);
+            border-radius: 4px; outline: none;
+            transition: background 0.3s var(--transition-smooth);
+            cursor: pointer;
+        }
+
+        .af-slider-wrap input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none; appearance: none;
+            width: 20px; height: 20px; border-radius: 50%;
+            background: var(--accent); border: 3px solid var(--bg);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            cursor: pointer;
+            transition: transform 0.2s var(--transition-smooth);
+        }
+        .af-slider-wrap input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.15);
+        }
+
+        .af-slider-labels {
+            display: flex; justify-content: space-between;
+            font-size: 0.6875rem; color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        .af-submit-row {
+            display: flex; gap: 12px; margin-top: 8px;
+        }
+
+        /* Result card */
+        .assessment-result { margin-top: 32px; }
+
+        .ar-header {
+            display: flex; align-items: center; gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .ar-score-circle {
+            width: 72px; height: 72px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem; font-weight: 700; font-family: 'JetBrains Mono', monospace;
+            flex-shrink: 0;
+        }
+        .ar-score-circle.low { background: var(--risk-low-bg); color: var(--risk-low); border: 2px solid var(--risk-low); }
+        .ar-score-circle.medium { background: var(--risk-medium-bg); color: var(--risk-medium); border: 2px solid var(--risk-medium); }
+        .ar-score-circle.high { background: var(--risk-critical-bg); color: var(--risk-critical); border: 2px solid var(--risk-critical); }
+
+        .ar-info h3 { font-size: 1.125rem; margin-bottom: 4px; }
+        .ar-info .ar-label {
+            display: inline-block; padding: 3px 10px;
+            border-radius: 50px; font-size: 0.75rem; font-weight: 600;
+        }
+        .ar-info .ar-label.low { background: var(--risk-low-bg); color: var(--risk-low); }
+        .ar-info .ar-label.medium { background: var(--risk-medium-bg); color: var(--risk-medium); }
+        .ar-info .ar-label.high { background: var(--risk-critical-bg); color: var(--risk-critical); }
+
+        .ar-factors {
+            display: grid; grid-template-columns: repeat(4, 1fr);
+            gap: 12px; margin-bottom: 24px;
+        }
+
+        .ar-factor {
+            padding: 12px; background: var(--bg);
+            border-radius: 10px; text-align: center;
+        }
+
+        .ar-factor .af-label {
+            font-size: 0.6875rem; color: var(--text-secondary);
+            text-transform: uppercase; letter-spacing: 0.05em;
+            margin-bottom: 4px;
+        }
+
+        .ar-factor .af-score {
+            font-size: 1.25rem; font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--accent);
+        }
+
+        .ar-summary {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 14px; padding: 20px 24px;
+            margin-bottom: 24px; line-height: 1.7;
+            font-size: 0.9375rem; color: var(--text-primary);
+        }
+
+        .ar-summary p { margin-bottom: 12px; }
+        .ar-summary p:last-child { margin-bottom: 0; }
+
+        .ar-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+        .ar-actions .btn-secondary {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 10px 20px; border: 1px solid var(--border);
+            border-radius: 50px; font-size: 0.8125rem; font-weight: 500;
+            background: var(--surface); color: var(--text-secondary);
+            cursor: pointer; transition: all 0.2s var(--transition-smooth);
+            text-decoration: none;
+        }
+        .ar-actions .btn-secondary:hover {
+            border-color: var(--accent); color: var(--accent);
+        }
+
+        .conversation-viewer { flex:1; display:flex; flex-direction:column; padding:0; overflow:hidden; }
+        .conversation-viewer.hidden { display:none; }
+        .cv-header { display:flex; align-items:center; gap:12px; margin-bottom:20px; flex-shrink:0; }
+        .cv-header .cv-title { font-size:1rem; font-weight:600; flex:1; color:var(--text-primary); }
+        .cv-messages { flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:16px; padding-right:8px; }
+        .cv-msg { max-width:680px; width:100%; }
+        .cv-msg-user { padding:12px 16px; background:var(--surface); border:1px solid var(--border); border-radius:12px; font-size:0.9375rem; color:var(--text-primary); line-height:1.6; margin-left:auto; width:fit-content; max-width:80%; }
+        .cv-msg-assistant { display:flex; gap:12px; }
+        .cv-msg-avatar { width:32px;height:32px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:600;flex-shrink:0;color:var(--text-primary); }
+        .cv-msg-content { flex:1; font-size:0.9375rem; line-height:1.7; color:var(--text-primary); }
+        .cv-msg-content p { margin-bottom:8px; }
+        .cv-msg-content p:last-child { margin-bottom:0; }
+        .cv-msg-content a { color:var(--accent); text-decoration:underline; }
+        .cv-empty { color:var(--text-secondary); font-size:0.875rem; text-align:center; padding:40px 0; }
+
+        @media (max-width: 640px) {
+            .ar-factors { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <div class="shader-overlay" style="position:fixed;inset:0;height:100vh;opacity:0.12;z-index:0;pointer-events:none;">
+        <canvas id="shaderCanvas" style="width:100%;height:100%;"></canvas>
+    </div>
+
+    <div class="app-shell" style="position:relative;z-index:1;">
+        <!-- Sidebar Overlay (mobile) -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+        <!-- Sidebar -->
+        <aside class="app-sidebar glass-card-strong" id="appSidebar" style="border-right:1px solid var(--border);border-radius:0;">
+            <div class="sidebar-header">
+                <a href="index.html" class="sidebar-logo">
+                    <span class="accent-dot"></span>
+                    Sitewise
+                </a>
+                <button class="sidebar-close" id="sidebarClose">&times;</button>
+            </div>
+
+            <div class="sidebar-nav">
+                <a href="buying-assistant.html" class="sidebar-nav-link" id="buyingAssistantLink">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+                    </svg>
+                    Buying Assistant
+                </a>
+                <a href="app.html" class="sidebar-nav-link active" id="assessmentsLink">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 14l2 2 4-4"/>
+                    </svg>
+                    Assessments
+                </a>
+            </div>
+
+            <div class="sidebar-history" id="appSidebarHistory">
+                <div class="history-group-label">Recent Conversations</div>
+            </div>
+
+            <div class="sidebar-user" id="sidebarUser">
+                <div class="sidebar-user-avatar" id="userAvatar">U</div>
+                <div class="sidebar-user-info">
+                    <div class="sidebar-user-name" id="userName">User</div>
+                    <div class="sidebar-user-email" id="userEmail">user@email.com</div>
+                </div>
+                <button class="sidebar-logout" id="logoutBtn">Log out</button>
+            </div>
+        </aside>
+
+        <!-- Main Panel -->
+        <main class="app-main">
+            <div class="app-topbar">
+                <button class="sidebar-toggle" id="sidebarToggle">&#9776;</button>
+                <span class="app-topbar-title" id="topbarTitle">Welcome</span>
+            </div>
+
+            <div class="app-content" id="appContent">
+                <!-- Welcome State -->
+                <div class="empty-state" id="emptyState">
+                    <div class="empty-state-logo">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+                        </svg>
+                    </div>
+                    <h2>Welcome to Sitewise</h2>
+                    <p>Start a conversation with the Buying Assistant for country-specific guidance on property rules, red flags, and construction materials. Or run a new risk assessment on any project.</p>
+                    <div class="empty-state-actions">
+                        <a href="buying-assistant.html" class="btn-primary">Open Buying Assistant</a>
+                        <div class="empty-state-hints">
+                            <span class="empty-state-hint">&#128176; How much house can I afford?</span>
+                            <span class="empty-state-hint">&#128679; What permits do I need to build?</span>
+                            <span class="empty-state-hint">&#127963; Red flags when buying land?</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Risk Assessment Section (hidden by default, shown via bridge flow) -->
+                <div class="assessment-section hidden" id="assessmentSection">
+                    <div id="assessmentBridgeBanner" class="assessment-bridge-banner hidden">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+                        <span>From conversation: <strong id="bridgeConvoTitle">...</strong></span>
+                        <a href="buying-assistant.html" id="bridgeBackLink">Back to chat &rarr;</a>
+                    </div>
+
+                    <div class="assessment-form glass-card" id="assessmentForm" style="padding:24px;">
+                        <h2 style="font-size:1.25rem;margin-bottom:4px;">Risk Assessment</h2>
+                        <p style="font-size:0.875rem;color:var(--text-secondary);margin-bottom:4px;">
+                            Rate each risk factor on a scale of 1 (low risk) to 10 (high risk).
+                        </p>
+
+                        <div class="af-field">
+                            <label>Project name</label>
+                            <input type="text" id="afProjectName" placeholder="e.g. Lakeside Villa Construction" maxlength="100">
+                        </div>
+
+                        <div class="af-field">
+                            <label>Budget risk <span class="af-value" id="afBudgetVal">5</span></label>
+                            <div class="af-slider-wrap">
+                                <input type="range" id="afBudget" min="1" max="10" value="5">
+                                <div class="af-slider-labels">
+                                    <span>Low risk</span>
+                                    <span>High risk</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="af-field">
+                            <label>Timeline risk <span class="af-value" id="afTimelineVal">5</span></label>
+                            <div class="af-slider-wrap">
+                                <input type="range" id="afTimeline" min="1" max="10" value="5">
+                                <div class="af-slider-labels">
+                                    <span>Low risk</span>
+                                    <span>High risk</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="af-field">
+                            <label>Safety risk <span class="af-value" id="afSafetyVal">5</span></label>
+                            <div class="af-slider-wrap">
+                                <input type="range" id="afSafety" min="1" max="10" value="5">
+                                <div class="af-slider-labels">
+                                    <span>Low risk</span>
+                                    <span>High risk</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="af-field">
+                            <label>Resources risk <span class="af-value" id="afResourcesVal">5</span></label>
+                            <div class="af-slider-wrap">
+                                <input type="range" id="afResources" min="1" max="10" value="5">
+                                <div class="af-slider-labels">
+                                    <span>Low risk</span>
+                                    <span>High risk</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="af-submit-row">
+                            <button class="btn-primary" id="afSubmitBtn" style="flex:1;">Assess Risk</button>
+                            <button class="btn-secondary" id="afCancelBtn" style="display:none;">Cancel</button>
+                        </div>
+                    </div>
+
+                    <!-- Result -->
+                    <div class="assessment-result hidden" id="assessmentResult">
+                        <div class="glow-orb glow-orb-sm" style="top:80px;left:60px;opacity:0.25;position:absolute;z-index:0;"></div>
+                        <div class="ar-header" style="position:relative;z-index:1;">
+                            <div class="ar-score-circle idle-float" id="arScoreCircle">42</div>
+                            <div class="ar-info">
+                                <h3 id="arProjectName">Project Name</h3>
+                                <span class="ar-label" id="arRiskLabel">MEDIUM</span>
+                            </div>
+                        </div>
+
+                        <div class="ar-factors">
+                            <div class="ar-factor">
+                                <div class="af-label">Budget</div>
+                                <div class="af-score" id="arBudget">5</div>
+                            </div>
+                            <div class="ar-factor">
+                                <div class="af-label">Timeline</div>
+                                <div class="af-score" id="arTimeline">5</div>
+                            </div>
+                            <div class="ar-factor">
+                                <div class="af-label">Safety</div>
+                                <div class="af-score" id="arSafety">5</div>
+                            </div>
+                            <div class="ar-factor">
+                                <div class="af-label">Resources</div>
+                                <div class="af-score" id="arResources">5</div>
+                            </div>
+                        </div>
+
+                        <div class="ar-summary glass-card" id="arSummary" style="padding:20px 24px;">
+
+                        <div class="ar-actions">
+                            <button class="btn-primary" id="arSaveBtn">Save Assessment</button>
+                            <button class="btn-secondary" id="arPdfBtn">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                Export PDF
+                            </button>
+                            <button class="btn-secondary" id="arNewBtn">New Assessment</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Conversation Viewer -->
+                <div class="conversation-viewer hidden glass-card" id="conversationViewer" style="padding:24px 32px;">
+                    <div class="cv-header">
+                        <button class="btn-secondary" id="cvBackBtn">&larr; Back</button>
+                        <span class="cv-title" id="cvTitle">Conversation</span>
+                        <a class="btn-primary" id="cvContinueBtn" href="#" style="font-size:0.8125rem;padding:10px 20px;">Continue Chat</a>
+                    </div>
+                    <div class="cv-messages" id="cvMessages"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="shader.js"></script>
+    <script src="api.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

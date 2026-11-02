@@ -1,0 +1,9 @@
+.git
+.gitignore
+.vercel
+.env*
+out
+testfolder
+presentation
+excel
+nul

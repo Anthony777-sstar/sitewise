@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sitewise — Presentation</title>
+    <style>
+        *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+        html{scroll-behavior:smooth}
+        body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen,Ubuntu,Cantarell,sans-serif;background:#EFEFEF;color:#111}
+
+        .deck{height:100vh;overflow-y:scroll;scroll-snap-type:y mandatory;-webkit-overflow-scrolling:touch}
+        .deck::-webkit-scrollbar{display:none}
+
+        .slide{position:relative;width:100vw;height:100vh;scroll-snap-align:start;display:flex;flex-direction:column;overflow:hidden;flex-shrink:0}
+        .shader-overlay{position:absolute;inset:0;z-index:1;pointer-events:none}
+        .shader-overlay canvas{display:block;width:100%;height:100%}
+
+        .slide-content{position:relative;z-index:2;flex:1;display:flex;flex-direction:column;padding:32px 48px 48px}
+        @media(max-width:768px){.slide-content{padding:20px 24px 32px}}
+
+        /* ─── Nav ─── */
+        .slide-nav{display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+        .slide-logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:#111}
+        .slide-logo-mark{width:36px;height:36px;background:#111;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px;letter-spacing:-0.02em}
+        .slide-logo-text{font-size:15px;font-weight:600;letter-spacing:-0.02em}
+        .slide-nav-links{display:flex;align-items:center;gap:24px}
+        .slide-nav-links a{font-size:13px;color:#666;text-decoration:none;transition:color .3s;cursor:default}
+        .slide-nav-links a:hover{color:#111}
+
+        /* ─── Body ─── */
+        .slide-body{flex:1;display:flex;flex-direction:column;justify-content:center;gap:32px}
+        @media(max-width:768px){.slide-body{gap:24px}}
+
+        .slide-headline{max-width:900px}
+        .slide-headline h1{font-size:clamp(1.6rem,4vw,3.6rem);font-weight:500;line-height:1.08;letter-spacing:-0.03em;color:#111}
+        .slide-headline h2{font-size:clamp(1.3rem,3.2vw,2.8rem);font-weight:500;line-height:1.12;letter-spacing:-0.02em;color:#111}
+        .slide-headline .accent{color:#F26522}
+        .slide-sub{font-size:clamp(0.95rem,1.4vw,1.2rem);color:#555;line-height:1.6;max-width:700px;margin-top:12px}
+
+        /* ─── Grid ─── */
+        .slide-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:760px}
+        @media(max-width:500px){.slide-grid{grid-template-columns:1fr}}
+        .slide-card{background:rgba(255,255,255,.7);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-radius:16px;padding:20px 24px;border:1px solid rgba(0,0,0,.04);transition:transform .3s,box-shadow .3s}
+        .slide-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.06)}
+        .slide-card-icon{width:28px;height:28px;border-radius:8px;background:#F26522;display:flex;align-items:center;justify-content:center;margin-bottom:10px;color:#fff}
+        .slide-card-icon svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+        .slide-card h3{font-size:15px;font-weight:600;margin-bottom:4px;letter-spacing:-0.01em}
+        .slide-card p{font-size:13px;color:#666;line-height:1.5}
+
+        /* ─── List / Steps ─── */
+        .steps{display:flex;flex-direction:column;gap:14px;max-width:650px}
+        .step{display:flex;align-items:flex-start;gap:16px;background:rgba(255,255,255,.5);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border-radius:14px;padding:18px 22px;border:1px solid rgba(0,0,0,.04)}
+        .step-num{width:30px;height:30px;border-radius:50%;background:#F26522;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;flex-shrink:0}
+        .step-text{flex:1}
+        .step-text strong{display:block;font-size:14px;font-weight:600;margin-bottom:2px}
+        .step-text span{font-size:13px;color:#555;line-height:1.5;display:block}
+
+        /* ─── Domain items ─── */
+        .domains{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:700px}
+        @media(max-width:500px){.domains{grid-template-columns:1fr}}
+        .domain{background:rgba(255,255,255,.5);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border-radius:12px;padding:16px 20px;border:1px solid rgba(0,0,0,.04);border-left:3px solid #F26522}
+        .domain h4{font-size:14px;font-weight:600;margin-bottom:4px}
+        .domain p{font-size:12.5px;color:#555;line-height:1.5}
+
+        /* ─── Footer row ─── */
+        .slide-footer{display:flex;align-items:center;gap:20px;flex-wrap:wrap;flex-shrink:0}
+        .slide-cta{display:inline-flex;align-items:center;gap:8px;background:#F26522;color:#fff;border:none;border-radius:999px;padding:10px 24px 10px 28px;font-size:14px;font-weight:500;cursor:pointer;text-decoration:none;transition:background .3s}
+        .slide-cta:hover{background:#e05a1a}
+        .slide-cta svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:transform .3s}
+        .slide-cta:hover svg{transform:rotate(-45deg)}
+        .slide-badge{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.8);border-radius:4px;padding:6px 12px;font-size:12px;color:#555;border:1px solid rgba(0,0,0,.04)}
+        .slide-badge svg{width:18px;height:18px;fill:#E8704E;flex-shrink:0}
+        .slide-badge-featured{background:#111;color:#fff;font-size:10px;padding:2px 8px;border-radius:4px;font-weight:500}
+        .slide-badge-text{font-weight:500}
+
+        /* ─── Slide number ─── */
+        .slide-number{position:absolute;bottom:32px;right:48px;z-index:3;font-size:12px;color:#999;font-weight:500;letter-spacing:.02em}
+        @media(max-width:768px){.slide-number{bottom:20px;right:24px}}
+
+        /* ─── Dots ─── */
+        .dots{position:fixed;right:20px;top:50%;transform:translateY(-50%);z-index:100;display:flex;flex-direction:column;gap:10px}
+        @media(max-width:600px){.dots{right:10px;gap:8px}}
+        .dot{width:8px;height:8px;border-radius:50%;background:rgba(0,0,0,.15);border:none;cursor:pointer;transition:all .3s;padding:0}
+        .dot.active{background:#F26522;transform:scale(1.4)}
+        .dot:hover{background:#F26522}
+        .dot-label{position:absolute;right:18px;top:50%;transform:translateY(-50%);font-size:11px;color:#999;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .2s}
+        .dot:hover .dot-label{opacity:1}
+
+        /* ─── Slide-specific backgrounds (subtle solid fills) ─── */
+        .slide-bg-alt .shader-overlay{opacity:.5}
+    </style>
+</head>
+<body>
+
+<div class="deck" id="deck">
+
+    <!-- ═══ SLIDE 1: TITLE ═══ -->
+    <div class="slide" data-slide="0">
+        <div class="shader-overlay">
+            <canvas id="shaderCanvas"></canvas>
+        </div>
+        <div class="slide-content">
+            <div class="slide-nav">
+                <a href="#" class="slide-logo" onclick="return false">
+                    <span class="slide-logo-mark">SW</span>
+                    <span class="slide-logo-text">Sitewise</span>
+                </a>
+                <div class="slide-nav-links">
+                    <a href="#" onclick="return false">Features</a>
+                    <a href="#" onclick="return false">How It Works</a>
+                    <a href="#" onclick="return false">Sign In</a>
+                </div>
+            </div>
+            <div class="slide-body">
+                <div class="slide-headline">
+                    <h1>Eliminate construction risk<br>blind spots with <span class="accent">AI-powered</span> precision</h1>
+                    <div class="slide-sub">A single platform to assess, score, and report construction project risk — from any device.</div>
+                </div>
+                <div class="slide-grid">
+                    <div class="slide-card">
+                        <div class="slide-card-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></div>
+                        <h3>Risk Scoring Engine</h3>
+                        <p>Four critical factors combined into a weighted 0–100 score with clear risk labels.</p>
+                    </div>
+                    <div class="slide-card">
+                        <div class="slide-card-icon"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 10h.01M12 10h.01M16 10h.01"/></svg></div>
+                        <h3>AI Executive Summaries</h3>
+                        <p>Natural-language breakdowns via Llama 3.3 70B with actionable recommendations.</p>
+                    </div>
+                    <div class="slide-card">
+                        <div class="slide-card-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+                        <h3>PDF Reports</h3>
+                        <p>All assessments saved to your account. Export clean PDF reports with one click.</p>
+                    </div>
+                    <div class="slide-card">
+                        <div class="slide-card-icon"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+                        <h3>Enterprise Security</h3>
+                        <p>Supabase Auth with Row Level Security. Your data is isolated and encrypted.</p>
+                    </div>
+                </div>
+                <div class="slide-footer">
+                    <a href="#" class="slide-cta" onclick="return false">
+                        Start Free Assessment
+                        <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                    </a>
+                    <div class="slide-badge">
+                        <svg viewBox="0 0 100 100"><path d="m19.6 66.5 19.7-11 .3-1-.3-.5h-1l-3.3-.2-11.2-.3L14 53l-9.5-.5-2.4-.5L0 49l.2-1.5 2-1.3 2.9.2 6.3.5 9.5.6 6.9.4L38 49.1h1.6l.2-.7-.5-.4-.4-.4L29 41l-10.6-7-5.6-4.1-3-2-1.5-2-.6-4.2 2.7-3 3.7.3.9.2 3.7 2.9 8 6.1L37 36l1.5 1.2.6-.4.1-.3-.7-1.1L33 25l-6-10.4-2.7-4.3-.7-2.6c-.3-1-.4-2-.4-3l3-4.2L28 0l4.2.6L33.8 2l2.6 6 4.1 9.3L47 29.9l2 3.8 1 3.4.3 1h.7v-.5l.5-7.2 1-8.7 1-11.2.3-3.2 1.6-3.8 3-2L61 2.6l2 2.9-.3 1.8-1.1 7.7L59 27.1l-1.5 8.2h.9l1-1.1 4.1-5.4 6.9-8.6 3-3.5L77 13l2.3-1.8h4.3l3.1 4.7-1.4 4.9-4.4 5.6-3.7 4.7-5.3 7.1-3.2 5.7.3.4h.7l12-2.6 6.4-1.1 7.6-1.3 3.5 1.6.4 1.6-1.4 3.4-8.2 2-9.6 2-14.3 3.3-.2.1.2.3 6.4.6 2.8.2h6.8l12.6 1 3.3 2 1.9 2.7-.3 2-5.1 2.6-6.8-1.6-16-3.8-5.4-1.3h-.8v.4l4.6 4.5 8.3 7.5L89 80.1l.5 2.4-1.3 2-1.4-.2-9.2-7-3.6-3-8-6.8h-.5v.7l1.8 2.7 9.8 14.7.5 4.5-.7 1.4-2.6 1-2.7-.6-5.8-8-6-9-4.7-8.2-.5.4-2.9 30.2-1.3 1.5-3 1.2-2.5-2-1.4-3 1.4-6.2 1.6-8 1.3-6.4 1.2-7.9.7-2.6v-.2H49L43 72l-9 12.3-7.2 7.6-1.7.7-3-1.5.3-2.8L24 86l10-12.8 6-7.9 4-4.6-.1-.5h-.3L17.2 77.4l-4.7.6-2-2 .2-3 1-1 8-5.5Z"/></svg>
+                        <span class="slide-badge-text">Powered by Groq AI</span>
+                        <span class="slide-badge-featured">Featured</span>
+                    </div>
+                </div>
+            </div>
+            <div class="slide-number">01 / 07</div>
+        </div>
+    </div>
+
+    <!-- ═══ SLIDE 2: PROBLEM ═══ -->
+    <div class="slide slide-bg-alt" data-slide="1">
+        <div class="slide-content">
+            <div class="slide-nav">
+                <a href="#" class="slide-logo" onclick="return false">
+                    <span class="slide-logo-mark">SW</span>
+                    <span class="slide-logo-text">Sitewise</span>
+                </a>
+                <div class="slide-nav-links">
+                    <a href="#" onclick="return false">Features</a>
+                    <a href="#" onclick="return false">How It Works</a>
+                    <a href="#" onclick="return false">Sign In</a>
+                </div>
+            </div>
+            <div class="slide-body">
+                <div class="slide-headline">
+                    <h2>The problem with<br>construction risk assessment</h2>
+                    <div class="slide-sub">Most teams still manage project risk with fragmented tools and manual processes — leaving critical blind spots.</div>
+                </div>
+                <div class="slide-grid" style="max-width:800px">
+                    <div class="slide-card">
+                        <div class="slide-card-icon"><svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></div>
+                        <h3>Scattered spreadsheets</h3>
+                        <p>Risk data lives across disconnected sheets, emails, and siloed project documents with no single source of truth.</p>
+                    </div>
+                    <div class="slide-card">
+                        <div class="slide-card-icon"><svg viewBox="0 0 24 24"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg></div>
+                        <h3>No standardized scoring</h3>
+                        <p>Every project manager assesses risk differently — inconsistent criteria lead to missed red flags.</p>
+                    </div>
+                    <div class="slide-card">
+                        <div class="slide-card-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
+                        <h3>Slow decision-making</h3>
+                        <p>By the time risks are compiled and reviewed, project timelines have already been impacted.</p>
+                    </div>
+                    <div class="slide-card">
+                        <div class="slide-card-icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+                        <h3>Incomplete oversight</h3>
+                        <p>Stakeholders lack a real-time view of project risk, making it hard to prioritize interventions.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="slide-number">02 / 07</div>
+        </div>
+    </div>
+
+    <!-- ═══ SLIDE 3: HOW IT WORKS — INPUT ═══ -->
+    <div class="slide" data-slide="2">
+        <div class="slide-content">
+            <div class="slide-nav">
+                <a href="#" class="slide-logo" onclick="return false">
+                    <span class="slide-logo-mark">SW</span>
+                    <span class="slide-logo-text">Sitewise</span>
+                </a>
+                <div class="slide-nav-links">
+                    <a href="#" onclick="return false">Features</a>
+                    <a href="#" onclick="return false">How It Works</a>
+                    <a href="#" onclick="return false">Sign In</a>
+                </div>
+            </div>
+            <div class="slide-body">
+                <div class="slide-headline">
+                    <h2>How it works: <span class="accent">Step 1</span></h2>
+                    <div class="slide-sub">Enter your project details — Sitewise does the rest.</div>
+                </div>
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-num">1</div>
+                        <div class="step-text">
+                            <strong>Tell us about your project</strong>
+                            <span>Fill out a simple form with your project name, location, budget, timeline, scope, and key stakeholders. The whole process takes under 2 minutes.</span>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-num">2</div>
+                        <div class="step-text">
+                            <strong>Rate risk factors</strong>
+                            <span>Answer a few guided questions about complexity, safety concerns, regulatory requirements, and team experience. Each answer feeds into the scoring engine.</span>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-num">3</div>
+                        <div class="step-text">
+                            <strong>AI processes instantly</strong>
+                            <span>Sitewise evaluates your inputs against four risk domains, cross-references them, and generates a complete risk profile — all in seconds.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="slide-number">03 / 07</div>
+        </div>
+    </div>
+
+    <!-- ═══ SLIDE 4: ANALYSIS ═══ -->
+    <div class="slide slide-bg-alt" data-slide="3">
+        <div class="slide-content">
+            <div class="slide-nav">
+                <a href="#" class="slide-logo" onclick="return false">
+                    <span class="slide-logo-mark">SW</span>
+                    <span class="slide-logo-text">Sitewise</span>
+                </a>
+                <div class="slide-nav-links">
+                    <a href="#" onclick="return false">Features</a>
+                    <a href="#" onclick="return false">How It Works</a>
+                    <a href="#" onclick="return false">Sign In</a>
+                </div>
+            </div>
+            <div class="slide-body">
+                <div class="slide-headline">
+                    <h2>How it works: <span class="accent">4 risk domains</span></h2>
+                    <div class="slide-sub">Our AI evaluates every project across four weighted domains to produce a balanced risk score.</div>
+                </div>
+                <div class="domains">
+                    <div class="domain">
+                        <h4>Scope Creep</h4>
+                        <p>Assesses project complexity, number of stakeholders, contract type, and change order history. Higher complexity = higher risk.</p>
+                    </div>
+                    <div class="domain">
+                        <h4>Safety &amp; Site Hazards</h4>
+                        <p>Evaluates work at height, confined spaces, hazardous materials, and neighboring structures. Flags high-risk site conditions.</p>
+                    </div>
+                    <div class="domain">
+                        <h4>Budget &amp; Schedule Pressure</h4>
+                        <p>Measures budget contingency, timeline compression, penalty clauses, and resource availability. Tight margins increase the score.</p>
+                    </div>
+                    <div class="domain">
+                        <h4>Compliance &amp; Regulatory</h4>
+                        <p>Reviews permit status, environmental regulations, zoning requirements, and inspection history. Gaps here raise immediate alerts.</p>
+                    </div>
+                </div>
+                <div class="slide-sub" style="margin-top:8px;font-size:13px;color:#888">Each domain contributes to a weighted total — the final 0–100 score tells you exactly where your project stands.</div>
+            </div>
+            <div class="slide-number">04 / 07</div>
+        </div>
+    </div>
+
+    <!-- ═══ SLIDE 5: SCORE + SUMMARY ═══ -->
+    <div class="slide" data-slide="4">
+        <div class="slide-content">
+            <div class="slide-nav">
+                <a href="#" class="slide-logo" onclick="return false">
+                    <span class="slide-logo-mark">SW</span>
+                    <span class="slide-logo-text">Sitewise</span>
+                </a>
+                <div class="slide-nav-links">
+                    <a href="#" onclick="return false">Features</a>
+                    <a href="#" onclick="return false">How It Works</a>
+                    <a href="#" onclick="return false">Sign In</a>
+                </div>
+            </div>
+            <div class="slide-body">
+                <div class="slide-headline">
+                    <h2>How it works: <span class="accent">Score + Summary</span></h2>
+                    <div class="slide-sub">Every assessment generates two powerful outputs — a clear score and an AI-written executive brief.</div>
+                </div>
+                <div class="slide-grid" style="max-width:800px">
+                    <div class="slide-card" style="border-left:3px solid #F26522">
+                        <div class="slide-card-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></div>
+                        <h3>Risk Score: 0–100</h3>
+                        <p><strong>Low (0–30):</strong> Standard monitoring sufficient<br><strong>Medium (31–55):</strong> Targeted mitigation recommended<br><strong>High (56–75):</strong> Active intervention required<br><strong>Critical (76–100):</strong> Immediate escalation needed</p>
+                    </div>
+                    <div class="slide-card" style="border-left:3px solid #F26522">
+                        <div class="slide-card-icon"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 10h.01M12 10h.01M16 10h.01"/></svg></div>
+                        <h3>AI Executive Summary (Llama 3.3 70B)</h3>
+                        <p>A natural-language breakdown of the key risk drivers, a plain-English explanation of the score, and 3–5 prioritized, actionable recommendations to reduce risk. Written in seconds, ready to share with stakeholders.</p>
+                    </div>
+                </div>
+                <div class="slide-sub" style="font-size:13px;color:#888">The combination of a quantitative score and a qualitative narrative gives you both the "what" and the "why" — so you can act with confidence.</div>
+            </div>
+            <div class="slide-number">05 / 07</div>
+        </div>
+    </div>
+
+    <!-- ═══ SLIDE 6: EXPORT + SECURITY ═══ -->
+    <div class="slide slide-bg-alt" data-slide="5">
+        <div class="slide-content">
+            <div class="slide-nav">
+                <a href="#" class="slide-logo" onclick="return false">
+                    <span class="slide-logo-mark">SW</span>
+                    <span class="slide-logo-text">Sitewise</span>
+                </a>
+                <div class="slide-nav-links">
+                    <a href="#" onclick="return false">Features</a>
+                    <a href="#" onclick="return false">How It Works</a>
+                    <a href="#" onclick="return false">Sign In</a>
+                </div>
+            </div>
+            <div class="slide-body">
+                <div class="slide-headline">
+                    <h2>How it works: <span class="accent">History + Export</span></h2>
+                    <div class="slide-sub">All assessments are saved, organized, and exportable — so you never lose a risk profile.</div>
+                </div>
+                <div class="slide-grid" style="max-width:800px">
+                    <div class="slide-card">
+                        <div class="slide-card-icon"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 16l4-8 4 4 4-6"/></svg></div>
+                        <h3>Project history</h3>
+                        <p>Every assessment is stored to your account. Browse past projects, compare scores over time, and track risk trends across your portfolio.</p>
+                    </div>
+                    <div class="slide-card">
+                        <div class="slide-card-icon"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+                        <h3>PDF reports</h3>
+                        <p>Export any assessment as a clean, professional PDF report with one click. Perfect for stakeholder meetings, compliance documentation, and client deliverables.</p>
+                    </div>
+                    <div class="slide-card">
+                        <div class="slide-card-icon"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+                        <h3>Enterprise security</h3>
+                        <p>Built on Supabase Auth with Row Level Security. Every user's data is isolated, encrypted at rest, and protected. SOC 2 compliant infrastructure.</p>
+                    </div>
+                    <div class="slide-card">
+                        <div class="slide-card-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
+                        <h3>Anywhere access</h3>
+                        <p>Fully responsive web app — works on desktop, tablet, and phone. Assess risk on-site, review on the go, present from any device.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="slide-number">06 / 07</div>
+        </div>
+    </div>
+
+    <!-- ═══ SLIDE 7: CTA ═══ -->
+    <div class="slide" data-slide="6">
+        <div class="shader-overlay">
+            <canvas id="shaderCanvas2"></canvas>
+        </div>
+        <div class="slide-content">
+            <div class="slide-nav">
+                <a href="#" class="slide-logo" onclick="return false">
+                    <span class="slide-logo-mark">SW</span>
+                    <span class="slide-logo-text">Sitewise</span>
+                </a>
+                <div class="slide-nav-links">
+                    <a href="#" onclick="return false">Features</a>
+                    <a href="#" onclick="return false">How It Works</a>
+                    <a href="#" onclick="return false">Sign In</a>
+                </div>
+            </div>
+            <div class="slide-body" style="align-items:center;text-align:center">
+                <div class="slide-headline" style="max-width:700px">
+                    <h1>Ready to eliminate<br>risk blind spots?</h1>
+                    <div class="slide-sub" style="max-width:500px;margin:12px auto 0">Join teams using Sitewise to assess, score, and report construction project risk with AI-powered precision.</div>
+                </div>
+                <div style="display:flex;flex-direction:column;align-items:center;gap:24px">
+                    <a href="#" class="slide-cta" style="font-size:16px;padding:14px 36px 14px 40px" onclick="return false">
+                        Start Free Assessment
+                        <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                    </a>
+                    <div class="slide-badge">
+                        <svg viewBox="0 0 100 100"><path d="m19.6 66.5 19.7-11 .3-1-.3-.5h-1l-3.3-.2-11.2-.3L14 53l-9.5-.5-2.4-.5L0 49l.2-1.5 2-1.3 2.9.2 6.3.5 9.5.6 6.9.4L38 49.1h1.6l.2-.7-.5-.4-.4-.4L29 41l-10.6-7-5.6-4.1-3-2-1.5-2-.6-4.2 2.7-3 3.7.3.9.2 3.7 2.9 8 6.1L37 36l1.5 1.2.6-.4.1-.3-.7-1.1L33 25l-6-10.4-2.7-4.3-.7-2.6c-.3-1-.4-2-.4-3l3-4.2L28 0l4.2.6L33.8 2l2.6 6 4.1 9.3L47 29.9l2 3.8 1 3.4.3 1h.7v-.5l.5-7.2 1-8.7 1-11.2.3-3.2 1.6-3.8 3-2L61 2.6l2 2.9-.3 1.8-1.1 7.7L59 27.1l-1.5 8.2h.9l1-1.1 4.1-5.4 6.9-8.6 3-3.5L77 13l2.3-1.8h4.3l3.1 4.7-1.4 4.9-4.4 5.6-3.7 4.7-5.3 7.1-3.2 5.7.3.4h.7l12-2.6 6.4-1.1 7.6-1.3 3.5 1.6.4 1.6-1.4 3.4-8.2 2-9.6 2-14.3 3.3-.2.1.2.3 6.4.6 2.8.2h6.8l12.6 1 3.3 2 1.9 2.7-.3 2-5.1 2.6-6.8-1.6-16-3.8-5.4-1.3h-.8v.4l4.6 4.5 8.3 7.5L89 80.1l.5 2.4-1.3 2-1.4-.2-9.2-7-3.6-3-8-6.8h-.5v.7l1.8 2.7 9.8 14.7.5 4.5-.7 1.4-2.6 1-2.7-.6-5.8-8-6-9-4.7-8.2-.5.4-2.9 30.2-1.3 1.5-3 1.2-2.5-2-1.4-3 1.4-6.2 1.6-8 1.3-6.4 1.2-7.9.7-2.6v-.2H49L43 72l-9 12.3-7.2 7.6-1.7.7-3-1.5.3-2.8L24 86l10-12.8 6-7.9 4-4.6-.1-.5h-.3L17.2 77.4l-4.7.6-2-2 .2-3 1-1 8-5.5Z"/></svg>
+                        <span class="slide-badge-text">Powered by Groq AI</span>
+                        <span class="slide-badge-featured">Featured</span>
+                    </div>
+                </div>
+            </div>
+            <div class="slide-number">07 / 07</div>
+        </div>
+    </div>
+
+</div>
+
+<!-- ═══ NAVIGATION DOTS ═══ -->
+<div class="dots" id="dots"></div>
+
+<script>
+    // ─── Shader ────────────────────────────────────────────
+    function initShader(canvasId) {
+        (async function init() {
+            const canvas = document.getElementById(canvasId);
+            if (!canvas) return;
+            const gl = canvas.getContext('webgl');
+            if (!gl) return;
+            const vertexSrc = 'attribute vec2 p;void main(){gl_Position=vec4(p,0,1);}';
+            const fragmentSrc = `
+                precision highp float;
+                uniform float t; uniform vec2 r;
+                float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
+                void main(){
+                    vec2 u=gl_FragCoord.xy/r;vec2 c=u-.5;float d=length(c),a=atan(c.y,c.x);
+                    float sw=sin(a*1.7+d*3.-t*.2)*.5+.5;
+                    vec3 tint=mix(vec3(.937),vec3(1,.373,.012),sw*.04);
+                    float gs=sin(u.x*6.+u.y*4.+t*.06)*.5+.5,hl=smoothstep(.4,.6,gs)*.04;
+                    float gr=mix(1.,h(floor(u*150.)),.03);
+                    vec3 bg=vec3(.937);gl_FragColor=vec4(mix(bg,tint,.15)*(bg+hl)*gr,1);
+                }
+            `;
+            function cs(s,t_){const sh=gl.createShader(t_);gl.shaderSource(sh,s);gl.compileShader(sh);return sh;}
+            const vs=cs(vertexSrc,gl.VERTEX_SHADER),fs=cs(fragmentSrc,gl.FRAGMENT_SHADER),p=gl.createProgram();
+            gl.attachShader(p,vs);gl.attachShader(p,fs);gl.linkProgram(p);gl.useProgram(p);
+            const pl=gl.getAttribLocation(p,'p'),tl=gl.getUniformLocation(p,'t'),rl=gl.getUniformLocation(p,'r');
+            const b=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,b);
+            gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,1,1]),gl.STATIC_DRAW);
+            gl.enableVertexAttribArray(pl);gl.vertexAttribPointer(pl,2,gl.FLOAT,false,0,0);
+            function rs(){const w=canvas.parentElement.clientWidth,h=canvas.parentElement.clientHeight;canvas.width=w;canvas.height=h;gl.viewport(0,0,w,h);gl.uniform2f(rl,w,h);}
+            rs();window.addEventListener('resize',rs);
+            let s=performance.now();
+            function rd(){gl.uniform1f(tl,(performance.now()-s)/1000);gl.drawArrays(gl.TRIANGLE_STRIP,0,4);requestAnimationFrame(rd);}
+            rd();
+        })();
+    }
+    initShader('shaderCanvas');
+    initShader('shaderCanvas2');
+
+    // ─── Dots ──────────────────────────────────────────────
+    const deck = document.getElementById('deck');
+    const dotsContainer = document.getElementById('dots');
+    const slides = document.querySelectorAll('.slide');
+    const dotLabels = ['Title', 'Problem', 'Input', 'Domains', 'Score & Summary', 'Export', 'CTA'];
+
+    slides.forEach((_, i) => {
+        const dot = document.createElement('button');
+        dot.className = 'dot' + (i === 0 ? ' active' : '');
+        dot.setAttribute('aria-label', 'Go to slide ' + (i + 1));
+        dot.dataset.index = i;
+        const label = document.createElement('span');
+        label.className = 'dot-label';
+        label.textContent = dotLabels[i];
+        dot.appendChild(label);
+        dot.addEventListener('click', () => {
+            slides[i].scrollIntoView({ behavior: 'smooth' });
+        });
+        dotsContainer.appendChild(dot);
+    });
+
+    // ─── Active dot tracking ───────────────────────────────
+    const dots = dotsContainer.querySelectorAll('.dot');
+    let isScrolling;
+    deck.addEventListener('scroll', () => {
+        clearTimeout(isScrolling);
+        isScrolling = setTimeout(() => {
+            const center = deck.scrollTop + deck.clientHeight / 2;
+            let activeIdx = 0;
+            slides.forEach((slide, i) => {
+                const top = slide.offsetTop;
+                const bottom = top + slide.clientHeight;
+                if (center >= top && center < bottom) activeIdx = i;
+            });
+            dots.forEach((d, i) => d.classList.toggle('active', i === activeIdx));
+        }, 50);
+    });
+
+    // ─── Keyboard navigation ───────────────────────────────
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+            e.preventDefault();
+            const active = document.querySelector('.dot.active');
+            const next = active?.nextElementSibling;
+            if (next) next.click();
+        }
+        if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+            e.preventDefault();
+            const active = document.querySelector('.dot.active');
+            const prev = active?.previousElementSibling;
+            if (prev) prev.click();
+        }
+    });
+</script>
+</body>
+</html>
